@@ -14,7 +14,7 @@
             //salvando no local storage
             localStorage.setItem('patio', JSON.stringify(veiculo));
         }
-        function add(veiculo) {
+        function add(veiculo, salvar) {
             var _a;
             const row = document.createElement("tr");
             //criando tabela
@@ -29,12 +29,22 @@
             //inserindo elemento no HTML
             (_a = $('#patio')) === null || _a === void 0 ? void 0 : _a.appendChild(row);
             //salvando no local storage - lendo todas as informações do local storage para salvar
-            save([...read(), veiculo]);
+            if (salvar)
+                save([...read(), veiculo]);
         }
         function remove() { }
-        function render() { }
+        function render() {
+            $('#patio').innerHTML = '';
+            const patio = read();
+            //se existe veiculos no local store ele adiciona na tabela
+            if (patio.length) {
+                patio.forEach((veiculo) => add(veiculo));
+            }
+        }
         return { read, add, remove, save, render };
     }
+    //chamando função de render
+    patioHandle().render();
     (_a = $('#cadastrar')) === null || _a === void 0 ? void 0 : _a.addEventListener("click", () => {
         var _a, _b;
         const nome = (_a = $('#nome')) === null || _a === void 0 ? void 0 : _a.value;
@@ -43,6 +53,6 @@
             alert('Nome e placa do veiculo obrigatórios');
             return;
         }
-        patioHandle().add({ nome, placa, entrada: new Date() });
+        patioHandle().add({ nome, placa, entrada: new Date() }, true);
     });
 })();

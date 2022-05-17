@@ -10,7 +10,7 @@ interface Veiculo {
     const $ = (query: string): HTMLInputElement | null => document.querySelector(query);
 
     function patioHandle() {
-        function read(){
+        function read(): Veiculo[] {
             //verificando se há informações no local storage
             return localStorage.patio? JSON.parse(localStorage.patio) : [];
         }
@@ -21,7 +21,7 @@ interface Veiculo {
             localStorage.setItem('patio', JSON.stringify(veiculo));
         }
 
-        function add(veiculo: Veiculo) {
+        function add(veiculo: Veiculo, salvar?: boolean) {
             const row = document.createElement("tr");
 
             //criando tabela
@@ -38,16 +38,28 @@ interface Veiculo {
             $('#patio')?.appendChild(row);
 
             //salvando no local storage - lendo todas as informações do local storage para salvar
-            save([...read(), veiculo])
+            if (salvar) save([...read(), veiculo])
         }
 
         function remove(){}
 
 
-        function render(){}
+        function render(){
+            $('#patio')!.innerHTML = '';
+
+            const patio = read();
+
+            //se existe veiculos no local store ele adiciona na tabela
+            if(patio.length) {
+                patio.forEach((veiculo) => add(veiculo))
+            }
+        }
 
         return { read, add, remove, save, render };
     }
+
+    //chamando função de render
+    patioHandle().render()
 
     $('#cadastrar')?.addEventListener("click", () => {
         const nome = $('#nome')?.value;
@@ -58,7 +70,7 @@ interface Veiculo {
             return;
         }
 
-        patioHandle().add({ nome, placa, entrada: new Date() });
+        patioHandle().add({ nome, placa, entrada: new Date() }, true);
     })
 
 })();
