@@ -10,7 +10,16 @@ interface Veiculo {
     const $ = (query: string): HTMLInputElement | null => document.querySelector(query);
 
     function patioHandle() {
-        function read(){}
+        function read(){
+            //verificando se há informações no local storage
+            return localStorage.patio? JSON.parse(localStorage.patio) : [];
+        }
+
+        //save espera um array de veiculo "lista"
+        function save(veiculo: Veiculo[]){
+            //salvando no local storage
+            localStorage.setItem('patio', JSON.stringify(veiculo));
+        }
 
         function add(veiculo: Veiculo) {
             const row = document.createElement("tr");
@@ -27,11 +36,13 @@ interface Veiculo {
 
             //inserindo elemento no HTML
             $('#patio')?.appendChild(row);
+
+            //salvando no local storage - lendo todas as informações do local storage para salvar
+            save([...read(), veiculo])
         }
 
         function remove(){}
 
-        function save(){}
 
         function render(){}
 

@@ -5,7 +5,15 @@
     /* HTMLInputElement entende que todas as informações/eventos serão de input */
     const $ = (query) => document.querySelector(query);
     function patioHandle() {
-        function read() { }
+        function read() {
+            //verificando se há informações no local storage
+            return localStorage.patio ? JSON.parse(localStorage.patio) : [];
+        }
+        //save espera um array de veiculo "lista"
+        function save(veiculo) {
+            //salvando no local storage
+            localStorage.setItem('patio', JSON.stringify(veiculo));
+        }
         function add(veiculo) {
             var _a;
             const row = document.createElement("tr");
@@ -20,9 +28,10 @@
             `;
             //inserindo elemento no HTML
             (_a = $('#patio')) === null || _a === void 0 ? void 0 : _a.appendChild(row);
+            //salvando no local storage - lendo todas as informações do local storage para salvar
+            save([...read(), veiculo]);
         }
         function remove() { }
-        function save() { }
         function render() { }
         return { read, add, remove, save, render };
     }
