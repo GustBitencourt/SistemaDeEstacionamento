@@ -1,13 +1,20 @@
 interface Veiculo {
     nome?: String;
     placa?: String;
-    entrada?: Date;
+    entrada?: Date | string;
 }
 
 (function () {
     /* atalho pra usar query selector */
     /* HTMLInputElement entende que todas as informações/eventos serão de input */
     const $ = (query: string): HTMLInputElement | null => document.querySelector(query);
+
+    function timeParked(mil: number) {
+        const min = Math.floor(mil / 60000);
+        const seg = Math.floor((mil % 60000) / 1000);
+
+        return `${min} minutos e ${seg} segundos`;
+    }
 
     function patioHandle() {
         function read(): Veiculo[] {
@@ -34,15 +41,30 @@ interface Veiculo {
             </td>
             `;
 
+            row.querySelector(".delete")?.addEventListener("click", function() {
+                remove(this.dataset.placa);
+            });
+
             //inserindo elemento no HTML
             $('#patio')?.appendChild(row);
 
             //salvando no local storage - lendo todas as informações do local storage para salvar
-            if (salvar) save([...read(), veiculo])
+            if (salvar) save([...read(), veiculo]);
         }
 
-        function remove(){}
+        function remove(placa: string){
+            const { nome, entrada } = read().find((veiculo) => veiculo.placa === placa);
 
+            const tempoDeEstadia = timeParked(new Date().getTime() - new Date(entrada).getTime());
+
+            //se o usuario confirmar não faz nada
+            if (confirm(`O veiculo ${nome} foi estacionado por ${tempoDeEstadia}. Deseja sair?`))
+                save(read().filter((veiculo) => veiculo.placa !== placa));
+                render();            
+                return;
+                
+            //remove o item
+        }
 
         function render(){
             $('#patio')!.innerHTML = '';
@@ -54,7 +76,6 @@ interface Veiculo {
                 patio.forEach((veiculo) => add(veiculo))
             }
         }
-
         return { read, add, remove, save, render };
     }
 
@@ -70,7 +91,7 @@ interface Veiculo {
             return;
         }
 
-        patioHandle().add({ nome, placa, entrada: new Date() }, true);
+        patioHandle().add({ nome, placa, entrada: new Date().toISOString() }, true);
     })
 
 })();

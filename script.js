@@ -1,9 +1,13 @@
-"use strict";
 (function () {
     var _a;
     /* atalho pra usar query selector */
     /* HTMLInputElement entende que todas as informações/eventos serão de input */
     const $ = (query) => document.querySelector(query);
+    function timeParked(mil) {
+        const min = Math.floor(mil / 60000);
+        const seg = Math.floor((mil % 60000) / 1000);
+        return `${min} minutos e ${seg} segundos`;
+    }
     function patioHandle() {
         function read() {
             //verificando se há informações no local storage
@@ -15,7 +19,7 @@
             localStorage.setItem('patio', JSON.stringify(veiculo));
         }
         function add(veiculo, salvar) {
-            var _a;
+            var _a, _b;
             const row = document.createElement("tr");
             //criando tabela
             row.innerHTML = `
@@ -26,13 +30,25 @@
                 <button class="delete" data-placa="${veiculo.placa}">X</button>
             </td>
             `;
+            (_a = row.querySelector(".delete")) === null || _a === void 0 ? void 0 : _a.addEventListener("click", function () {
+                remove(this.dataset.placa);
+            });
             //inserindo elemento no HTML
-            (_a = $('#patio')) === null || _a === void 0 ? void 0 : _a.appendChild(row);
+            (_b = $('#patio')) === null || _b === void 0 ? void 0 : _b.appendChild(row);
             //salvando no local storage - lendo todas as informações do local storage para salvar
             if (salvar)
                 save([...read(), veiculo]);
         }
-        function remove() { }
+        function remove(placa) {
+            const { nome, entrada } = read().find((veiculo) => veiculo.placa === placa);
+            const tempoDeEstadia = timeParked(new Date().getTime() - new Date(entrada).getTime());
+            //se o usuario confirmar não faz nada
+            if (confirm(`O veiculo ${nome} foi estacionado por ${tempoDeEstadia}. Deseja sair?`))
+                save(read().filter((veiculo) => veiculo.placa !== placa));
+            render();
+            return;
+            //remove o item
+        }
         function render() {
             $('#patio').innerHTML = '';
             const patio = read();
@@ -53,6 +69,6 @@
             alert('Nome e placa do veiculo obrigatórios');
             return;
         }
-        patioHandle().add({ nome, placa, entrada: new Date() }, true);
+        patioHandle().add({ nome, placa, entrada: new Date().toISOString() }, true);
     });
 })();
